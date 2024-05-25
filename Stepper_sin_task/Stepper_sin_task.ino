@@ -36,17 +36,28 @@
 #include <ESP_FlexyStepper.h>
 
 // IO pin assignments
-const int MOTOR_STEP_PIN = 3;
-const int MOTOR_DIRECTION_PIN = 4;
+const int MOTOR2_STEP_PIN = 27;
+const int MOTOR2_DIRECTION_PIN = 14;
+const int MOTOR2_ENABLE_PIN = 33;
+
+// IO pin assignments
+const int MOTOR1_STEP_PIN = 26;
+const int MOTOR1_DIRECTION_PIN = 25;
+const int MOTOR1_ENABLE_PIN = 32;
 
 // create the stepper motor object
-ESP_FlexyStepper stepper;
+// ESP_FlexyStepper stepper1;
+ESP_FlexyStepper stepper2;
 
 void setup() 
 {
   Serial.begin(115200);
   // connect and configure the stepper motor to its IO pins
-  stepper.connectToPins(MOTOR_STEP_PIN, MOTOR_DIRECTION_PIN);
+  // stepper1.connectToPins(MOTOR1_STEP_PIN, MOTOR1_DIRECTION_PIN);
+  pinMode(MOTOR2_ENABLE_PIN, OUTPUT);
+  digitalWrite(MOTOR2_ENABLE_PIN,LOW);
+  stepper2.connectToPins(MOTOR2_STEP_PIN, MOTOR2_DIRECTION_PIN);
+  delay(2000);
 }
 
 void loop() 
@@ -68,21 +79,33 @@ void loop()
   //
 
   // set the speed and acceleration rates for the stepper motor
-  stepper.setSpeedInStepsPerSecond(100);
-  stepper.setAccelerationInStepsPerSecondPerSecond(100);
+  stepper2.setSpeedInStepsPerSecond(100);
+  stepper2.setAccelerationInStepsPerSecondPerSecond(100);
+
+  // set the speed and acceleration rates for the stepper motor
+  // stepper1.setSpeedInStepsPerSecond(100);
+  // stepper1.setAccelerationInStepsPerSecondPerSecond(100);
 
   // Rotate the motor in the forward direction one revolution (200 steps). 
   // This function call will not return until the motion is complete.
-  stepper.moveRelativeInSteps(200);
+  // stepper1.moveRelativeInSteps(200);
+  Serial.println("2000 pasos");
+  stepper2.moveRelativeInSteps(2000);
   delay(1000);
   // rotate backward 1 rotation, then wait 1 second
-  stepper.moveRelativeInSteps(-200);
+  // stepper1.moveRelativeInSteps(-200);
+  Serial.println("-2000 pasos");
+  stepper2.moveRelativeInSteps(-2000);
   delay(1000);
 
   // This time speedup the motor, turning 10 revolutions.  Note if you
   // tell a stepper motor to go faster than it can, it just stops.
-  stepper.setSpeedInStepsPerSecond(800);
-  stepper.setAccelerationInStepsPerSecondPerSecond(800);
-  stepper.moveRelativeInSteps(200 * 10);
+  // stepper1.setSpeedInStepsPerSecond(800);
+  // stepper1.setAccelerationInStepsPerSecondPerSecond(800);
+  // stepper1.moveRelativeInSteps(200 * 10);
+  Serial.println("2000 pasos rápidos");
+  stepper2.setSpeedInStepsPerSecond(800);
+  stepper2.setAccelerationInStepsPerSecondPerSecond(800);
+  stepper2.moveRelativeInSteps(200 * 10);
   delay(2000);
 }

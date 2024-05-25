@@ -18,29 +18,44 @@
 #include <ESP_FlexyStepper.h>
 
 // IO pin assignments
-const int MOTOR2_STEP_PIN = 27;
-const int MOTOR2_DIRECTION_PIN = 14;
-const int MOTOR2_ENABLE_PIN = 33;
-
-// IO pin assignments
 const int MOTOR1_STEP_PIN = 26;
 const int MOTOR1_DIRECTION_PIN = 25;
 const int MOTOR1_ENABLE_PIN = 32;
 
 // Speed settings
-const int DISTANCE_TO_TRAVEL_IN_STEPS = 5000;
+const int DISTANCE_TO_TRAVEL_IN_STEPS = 15000;
 const int SPEED_IN_STEPS_PER_SECOND = 2000;
 const int ACCELERATION_IN_STEPS_PER_SECOND = 200;
 const int DECELERATION_IN_STEPS_PER_SECOND = 200;
 
 // create the stepper motor object
 ESP_FlexyStepper stepper1;
-ESP_FlexyStepper stepper2;
 
 int previousDirection1 = -1;
-int previousDirection2 = -1;
 
+String initSteppersValidator(int num_motores, int *step_pins, int *direction_pins, int *enable_pins) {
+  String msg = "";
+  if (sizeof(step_pins) / 4.0 != num_motores)
+    msg = "Número de pines step incorrecto. ";
+  if (sizeof(direction_pins) / 4.0 != num_motores)
+    msg = msg + "Número de pines dir incorrecto. ";
+  if (sizeof(enable_pins) / 4.0 != num_motores)
+    msg = msg + "Número de pines enable incorrecto";
 
+  return msg;
+}
+ ESP_FlexyStepper *steppers_init(int num_motores,int *step_pins, int *direction_pins, int *enable_pins ){
+  ESP_FlexyStepper steppers[num_motores];
+  msg = initSteppersValidator(num_motores, step_pins, direction_pins, enable_pins)
+  if(msg!="")
+  {
+    Serial.print(msg);
+    return;
+  }
+  return steppers
+ }
+
+ steppers = steppers_init
 void setup()
 {
   Serial.begin(115200);
@@ -57,23 +72,7 @@ void setup()
   stepper1.startAsService();
   pinMode( MOTOR1_ENABLE_PIN, OUTPUT);
   digitalWrite(MOTOR1_ENABLE_PIN, LOW);
-
-
-
-
-  // connect and configure the stepper motor to its IO pins
-  stepper2.connectToPins(MOTOR2_STEP_PIN, MOTOR2_DIRECTION_PIN);
-  // set the speed and acceleration rates for the stepper motor
-  stepper2.setSpeedInStepsPerSecond(SPEED_IN_STEPS_PER_SECOND);
-  stepper2.setAccelerationInStepsPerSecondPerSecond(ACCELERATION_IN_STEPS_PER_SECOND);
-  stepper2.setDecelerationInStepsPerSecondPerSecond(DECELERATION_IN_STEPS_PER_SECOND);
-  
-  // Not start the stepper instance as a service in the "background" as a separate task
-  // and the OS of the ESP will take care of invoking the processMovement() task regularily so you can do whatever you want in the loop function
-  stepper2.startAsService();
-  pinMode( MOTOR2_ENABLE_PIN, OUTPUT);
-  digitalWrite(MOTOR2_ENABLE_PIN, LOW);
-
+  delay(1000);
 
 }
 
@@ -87,15 +86,6 @@ void loop()
     long relativeTargetPosition = DISTANCE_TO_TRAVEL_IN_STEPS * previousDirection1;
     Serial.printf("Moving stepper 1 by %ld steps\n", relativeTargetPosition);
     stepper1.setTargetPositionRelativeInSteps(relativeTargetPosition);
-  }
-
-
-  if (stepper2.getDistanceToTargetSigned() == 0)
-  {
-    previousDirection2 *= -1;
-    long relativeTargetPosition = DISTANCE_TO_TRAVEL_IN_STEPS * previousDirection2;
-    Serial.printf("Moving stepper 2 by %ld steps\n", relativeTargetPosition);
-    stepper2.setTargetPositionRelativeInSteps(relativeTargetPosition);
   }
   
   // Notice that you can now do whatever you want in the loop function without the need to call processMovement().
