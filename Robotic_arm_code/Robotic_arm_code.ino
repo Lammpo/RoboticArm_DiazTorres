@@ -1,20 +1,12 @@
 #include "FastAccelStepper.h"
+#include "Hardware_settings.h"
 
 // As in StepperDemo for Motor 1 on AVR
 //#define dirPinStepper    5
 //#define enablePinStepper 6
 //#define stepPinStepper   9  // OC1A in case of AVR
 
-// As in StepperDemo for Motor 1 on ESP32
-#define dirPinstepperGiro 25
-#define stepPinstepperGiro 26
-#define enablePinstepperGiro 32
 
-
-// As in StepperDemo for Motor 2 on ESP32
-#define stepPinstepperBrazo 27
-#define dirPinstepperBrazo 14
-#define enablePinstepperBrazo 33
 
 
 FastAccelStepperEngine engine = FastAccelStepperEngine();
