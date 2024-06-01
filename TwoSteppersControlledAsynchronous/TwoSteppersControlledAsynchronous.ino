@@ -20,18 +20,17 @@
 #include <ESP_FlexyStepper.h>
 
 // IO pin assignments
-const int MOTOR_1_STEP_PIN = 33;
+const int MOTOR_1_STEP_PIN = 26;
 const int MOTOR_1_DIRECTION_PIN = 25;
+const int MOTOR_1_ENABLE = 32;
 
-const int MOTOR_2_STEP_PIN = 16;
-const int MOTOR_2_DIRECTION_PIN = 17;
-
-const int EMERGENCY_STOP_PIN = 13; //define the IO pin the emergency stop switch is connected to
-const int LIMIT_SWITCH_PIN = 32;   //define the IO pin where the limit switches are connected to (switches in series in normally closed setup against ground)
+const int MOTOR_2_STEP_PIN = 27;
+const int MOTOR_2_DIRECTION_PIN = 14;
+const int MOTOR_2_ENABLE = 33;
 
 // Speed settings
-const int DISTANCE_TO_TRAVEL_IN_STEPS = 100;
-const int SPEED_IN_STEPS_PER_SECOND = 100;
+const int DISTANCE_TO_TRAVEL_IN_STEPS = 8000;
+const int SPEED_IN_STEPS_PER_SECOND = 1000;
 const int ACCELERATION_IN_STEPS_PER_SECOND = 800;
 const int DECELERATION_IN_STEPS_PER_SECOND = 800;
 
@@ -60,6 +59,12 @@ void setup()
   // and the OS of the ESP will take care of invoking the processMovement() task regularily so you can do whatever you want in the loop function
   stepper_x.startAsService(0);
   stepper_y.startAsService(0);
+  delay(2000);
+  pinMode(MOTOR_1_ENABLE, OUTPUT);
+  digitalWrite(MOTOR_1_ENABLE, LOW);
+  pinMode(MOTOR_2_ENABLE, OUTPUT);
+  digitalWrite(MOTOR_2_ENABLE, LOW);
+
 }
 
 void loop()
@@ -68,7 +73,7 @@ void loop()
   if (stepper_x.getDistanceToTargetSigned() == 0)
   {
     Serial.printf("Stepper positions: X: %i, Y: %i\n", stepper_x.getCurrentPositionInSteps(), stepper_y.getCurrentPositionInSteps());
-    delay(5000);
+    delay(2000);
     previousDirection *= -1;
     long relativeTargetPosition = DISTANCE_TO_TRAVEL_IN_STEPS * previousDirection;
     Serial.printf("Moving both stepper motors by %ld steps\n", relativeTargetPosition);
