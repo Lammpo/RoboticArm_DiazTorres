@@ -5,5 +5,7 @@ This project consists of the design and development -- hardware and software -- 
 - The actuator must be able to rotate indefinetely.
 - The actuator must be reemplazable for different functions.
 
-### License
+![Robot arm Solidworks model](RobotArm.PNG)
+
+## License
  This project is [MIT Licensed](LICENSE).
