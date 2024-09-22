@@ -1,3 +1,4 @@
 {
-    "cmake.sourceDirectory": "D:/OneDrive/Compartida Papá Pepe/Arduino/Proyectitos/BRAZO ROBÓTICO/Code/libraries/FastAccelStepper"
+    "cmake.sourceDirectory": "D:/OneDrive/Compartida Papá Pepe/Arduino/Proyectitos/BRAZO ROBÓTICO/Code/libraries/FastAccelStepper",
+    "C_Cpp.errorSquiggles": "disabled"
 }
