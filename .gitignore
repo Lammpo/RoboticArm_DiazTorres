@@ -1,0 +1,7 @@
+# Ignorar archivos de construcción de Arduino
+*.bin
+*.elf
+
+
+# Ignorar directorios de construcción
+build/
