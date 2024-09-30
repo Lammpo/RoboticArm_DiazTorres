@@ -1,85 +1,87 @@
-#include "FastAccelStepper.h"
 #include "Hardware_settings.h"
 
-// As in StepperDemo for Motor 1 on AVR
-//#define dirPinStepper    5
-//#define enablePinStepper 6
-//#define stepPinStepper   9  // OC1A in case of AVR
 
-
-
-
-FastAccelStepperEngine engine = FastAccelStepperEngine();
-
-FastAccelStepper *stepperGiro = NULL;
-FastAccelStepper *stepperBrazo = NULL;
 const int velBrazo = 1500;
 const int velGiro = 200;
 const int acel = 1000;
+bool dir = false;
 
 void setup() {
   Serial.begin(115200);
-  engine.init();
-  stepperGiro = engine.stepperConnectToPin(stepPinstepperGiro);
-  stepperBrazo = engine.stepperConnectToPin(stepPinstepperBrazo);
 
-  pinMode(enablePinstepperGiro, OUTPUT);
-  pinMode(enablePinstepperBrazo, OUTPUT);
+  pinMode(ENABLE_PIN_DRV1, OUTPUT);
+  pinMode(ENABLE_PIN_DRV2, OUTPUT);
+  pinMode(STEP_PIN_DRV1, OUTPUT);
+  pinMode(DIR_PIN_DRV1, OUTPUT);
 
-  digitalWrite(enablePinstepperGiro, HIGH);
-  digitalWrite(enablePinstepperBrazo, HIGH);
+  pinMode(STEP_PIN_DRV2, OUTPUT);
+  pinMode(DIR_PIN_DRV2, OUTPUT);
 
-  if (stepperGiro && stepperBrazo) {
-    Serial.print("Hemos entrado");
+  digitalWrite(ENABLE_PIN_DRV1, HIGH);
+  digitalWrite(ENABLE_PIN_DRV2, HIGH);
 
-    stepperGiro->setDirectionPin(dirPinstepperGiro);
-    stepperBrazo->setDirectionPin(dirPinstepperBrazo);
 
-    digitalWrite(enablePinstepperBrazo, LOW);
-    digitalWrite(enablePinstepperGiro, LOW);
-
-    stepperBrazo->setSpeedInHz(velBrazo);  // the parameter is steps/s !!!
-    stepperGiro->setSpeedInHz(velGiro);    // the parameter is steps/s !!!
-
-    stepperBrazo->setAcceleration(acel);
-    stepperGiro->setAcceleration(acel);
-  }
 
   delay(2000);
-  homeBrazo();
+  digitalWrite(ENABLE_PIN_DRV1, LOW);
+  digitalWrite(ENABLE_PIN_DRV2, LOW);
+  delay(50);
+
 }
 int dirGiro = -1;
 int dirBrazo = -1;
 int stepsGiro = 1000;
 int stepsBrazo = 6000;
 
-void homeBrazo() {
-  const int homeVel = 200;
-  const int homeAcel = 1000;
-  const int homePrecitionVel = 20;
-  const int homePrecitionAcel = 1000;
-  const bool first_aproach_finished = false;
 
-  Serial.println("Buscando el FC");
-  stepperBrazo->setSpeedInHz(homeVel);  // the parameter is steps/s !!!
-  stepperBrazo->setAcceleration(homeAcel);
-  stepperBrazo->move(-1000);  //Será movimiento continuo realmente
+void loop() {
+  Serial.println("Hola");
+  dir = !dir;
+  digitalWrite(DIR_PIN_DRV1, dir);
+  digitalWrite(DIR_PIN_DRV2, dir);
+  delay(500);
+  testingHardCode();
+}
+void allTogether(bool active) {
+  digitalWrite(STEP_PIN_DRV1, active);
+  digitalWrite(STEP_PIN_DRV2, active);
+}
+void testingHardCode() {
+  int maxSteps = 3000;
+  int maxAccelSteps = 30;
 
-  //Cuando ocurra la interrupción comienza la segunda fase
-  while (stepperBrazo->isRunning())
-    ;
-  if (!stepperBrazo->isRunning()) {
-    Serial.println("Buscando desconectar el fin de carrera");
-    delay(1000);
-    stepperBrazo->setSpeedInHz(homePrecitionVel);  // the parameter is steps/s !!!
-    stepperBrazo->setAcceleration(homePrecitionAcel);
-    stepperBrazo->move(200);
+
+  for (int i = 1; i < maxAccelSteps; i++) {
+    allTogether(true);
+    delay(vel_2_msDelay(i));
+    allTogether(false);
+    delay(vel_2_msDelay(i));
+  }
+
+  for (int i = 1; i < maxSteps; i++) {
+    // if(i%10 == 0){
+    //   measuring();
+    // }
+    allTogether(true);
+    delayMicroseconds(800);
+    allTogether(false);
+    delayMicroseconds(800);
+  }
+
+  for (int i = maxAccelSteps; i > 0; i--) {
+    allTogether(true);
+    delay(vel_2_msDelay(i));
+    allTogether(false);
+    delay(vel_2_msDelay(i));
   }
 }
-void loop() {
-  delay(100);
-}
 
+
+int vel_2_msDelay(int rev_per_second) {
+  int delay = 10000.0 / (STEPS_PER_REV * rev_per_second + 1);
+  Serial.println(delay);
+  return delay;
+}
 
 int revToStep(float rev, float reduction = 1, int step_per_rev = 200) {
   int steps = rev * step_per_rev * reduction;
@@ -88,12 +90,3 @@ int revToStep(float rev, float reduction = 1, int step_per_rev = 200) {
   return steps;
 }
 
-void testing() {
-
-  Serial.println("Testing");
-  int speed = steps_per_second(20, 50, 8, MAX_SPEED);
-  Serial.print(speed);
-  // stepperBrazo->setSpeedInHz(homeVel);  // the parameter is steps/s !!!
-  // stepperBrazo->setAcceleration(homeAcel);
-  // stepperBrazo->move(-1000); //Será movimiento continuo realmente
-}

@@ -20,15 +20,15 @@
 //PINOUT
 
 //Base giratoria
-#define dirPinstepperGiro 25
-#define stepPinstepperGiro 26
-#define enablePinstepperGiro 32
+#define DIR_PIN_DRV1 25
+#define STEP_PIN_DRV1 26
+#define ENABLE_PIN_DRV1 32
 
 
 // Brazo 1
-#define stepPinstepperBrazo 27
-#define dirPinstepperBrazo 14
-#define enablePinstepperBrazo 33
+#define DIR_PIN_DRV2 14
+#define STEP_PIN_DRV2 27
+#define ENABLE_PIN_DRV2 33
 
 // General parameters
 #define MAX_SPEED 50 // Grados/s
